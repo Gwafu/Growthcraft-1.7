@@ -81,11 +81,16 @@ Dir.glob("build/libs/growthcraft-*.jar") do |f|
       vflag = (verbose? && 'v') || ''
       # go ahead, SUE ME for using system, I don't feel like fighting with
       # ruby zip and `jar` does the job best.
-      system %(jar #{vflag}cf build/packages/#{filename} \
-        -C "#{dir}" mcmod.info \
-        -C "#{dir}/content" growthcraft/#{packname} \
-        -C "#{dir}/content" grc_#{packname}_logo.png \
-        -C "#{dir}/content" assets/grc#{packname})
+      content = [
+        %(-C "#{dir}" mcmod.info),
+        %(-C "#{dir}/content" growthcraft/#{packname}),
+        %(-C "#{dir}/content" grc_#{packname}_logo.png),
+        %(-C "#{dir}/content" assets/grc#{packname})
+      ]
+      # core requires the api as well -.-;
+      content << %(-C "#{dir}/content" growthcraft/api) if packname == 'core'
+      cmd = %(jar #{vflag}cf build/packages/#{filename} ) + content.join(" ")
+      system cmd
     end
   end
 end
